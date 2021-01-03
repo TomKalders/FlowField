@@ -34,6 +34,8 @@ private:
 	const bool ALLOW_DIAGONAL_MOVEMENT = true;
 	Elite::Vector2 m_StartPosition = Elite::ZeroVector2;
 	Elite::Vector2 m_TargetPosition = Elite::ZeroVector2;
+	int m_GoalNodeIdx{ invalid_node_index };
+
 
 	//Grid datamembers
 	static const int COLUMNS = 10;
@@ -65,8 +67,21 @@ private:
 	void MakeGridGraph();
 	void CreateCostField();
 	void CalculateIntegrationField();
+	void CalculateVectors();
 	void ResetField();
 	void UpdateImGui();
+
+	const std::vector<Elite::Vector2> m_Directions{
+		Elite::Vector2{-1,  1},
+		Elite::Vector2{ 0,  1},
+		Elite::Vector2{ 1,  1},
+		Elite::Vector2{ 1,  0},
+		Elite::Vector2{ 1, -1},
+		Elite::Vector2{ 0, -1},
+		Elite::Vector2{-1, -1},
+		Elite::Vector2{-1,  0},
+		Elite::Vector2{ 0,  0}
+	};
 
 	//C++ make the class non-copyable
 	FlowField(const FlowField&) = delete;

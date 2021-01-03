@@ -24,6 +24,9 @@ void FlowField::Start()
 
 	//Create Graph
 	MakeGridGraph();
+	CreateCostField();
+	CalculateIntegrationField();
+	
 }
 
 void FlowField::Update(float deltaTime)
@@ -80,6 +83,8 @@ void FlowField::MakeGridGraph()
 {
 	m_pGridGraph = new GridGraph<FlowFieldNode, GraphConnection>(COLUMNS, ROWS, m_SizeCell, false, true, 1.f, 1.5f);
 	m_pIntegrationField = new GridGraph<IntegrationFieldNode, GraphConnection>(COLUMNS, ROWS, m_SizeCell, false, true, 1.f, 1.5f);
+
+	m_GoalNodeIdx = (COLUMNS * ROWS) - 1;
 }
 
 void FlowField::CreateCostField()
@@ -101,6 +106,46 @@ void FlowField::CreateCostField()
 }
 
 void FlowField::CalculateIntegrationField()
+{
+	//Set total cost in all cells to 65535
+	ResetField();
+	std::list<int> openList{};
+
+	IntegrationFieldNode* goalNode = m_pIntegrationField->GetNode(m_GoalNodeIdx);
+	goalNode->SetIntegrationCost(0);
+	openList.push_back(m_GoalNodeIdx);
+
+	while (openList.size() > 0)
+	{
+		int currentIdx = openList.front();
+		IntegrationFieldNode* currentNode = m_pIntegrationField->GetNode(currentIdx);
+		//FlowFieldNode* currentFlowNode = m_pGridGraph->GetNode(currentIdx);
+		openList.pop_front();
+
+		auto neighbours = m_pGridGraph->GetConnections(currentIdx);
+		int neighbourCount = neighbours.size();
+
+		for (const auto& neighbour : neighbours)
+		{
+			FlowFieldNode* neighbourFlowNode = m_pGridGraph->GetNode(neighbour->GetTo());
+			IntegrationFieldNode* neighbourNode = m_pIntegrationField->GetNode(neighbour->GetTo());
+			
+			int endNodeCost{currentNode->GetIntegratinCost() + neighbourFlowNode->GetCost()};
+
+			if (endNodeCost < neighbourNode->GetIntegratinCost())
+			{
+				if (std::find(openList.begin(), openList.end(), neighbourNode->GetIndex()) != openList.end())
+				{
+					openList.push_back(neighbourNode->GetIndex());
+				}
+			}
+
+			neighbourNode->SetIntegrationCost(endNodeCost);
+		}
+	}
+}
+
+void FlowField::CalculateVectors()
 {
 
 }
