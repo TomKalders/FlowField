@@ -120,7 +120,7 @@ namespace Elite
 		IntegrationFieldNode(int index)
 			: GraphNode(index) {}
 	
-		int GetIntegratinCost() const { return m_IntegrationCost; }
+		int GetIntegrationCost() const { return m_IntegrationCost; }
 		void SetIntegrationCost(int integrationCost) { m_IntegrationCost = integrationCost; }
 
 	private:

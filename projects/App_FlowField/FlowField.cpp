@@ -3,6 +3,8 @@
 
 //Includes
 #include "FlowField.h"
+#include "projects/Shared/BaseAgent.h"
+#include "projects/Shared/NavigationColliderElement.h"
 #include "framework\EliteAI\EliteGraphs\EliteGraphAlgorithms\EAstar.h"
 #include "framework\EliteAI\EliteGraphs\EliteGraphAlgorithms\EBFS.h"
 
@@ -24,9 +26,8 @@ void FlowField::Start()
 
 	//Create Graph
 	MakeGridGraph();
-	CreateCostField();
-	CalculateIntegrationField();
-	
+	//CreateCostField();
+	CalculateFlowField();
 }
 
 void FlowField::Update(float deltaTime)
@@ -40,6 +41,8 @@ void FlowField::Update(float deltaTime)
 	//	MouseData mouseData = { INPUTMANAGER->GetMouseData(Elite::InputType::eMouseButton, Elite::InputMouseButton::eMiddle) };
 	//	Elite::Vector2 mousePos = DEBUGRENDERER2D->GetActiveCamera()->ConvertScreenToWorld({ (float)mouseData.X, (float)mouseData.Y });
 	//}
+
+	bool const leftMousePressed = INPUTMANAGER->IsMouseButtonUp(InputMouseButton::eLeft);
 
 	//IMGUI
 	UpdateImGui();
@@ -57,14 +60,6 @@ void FlowField::Render(float deltaTime) const
 		m_bDrawConnectionsCosts
 	);
 
-	//m_GraphRenderer.RenderGraph(
-	//	m_pIntegrationField,
-	//	m_bDrawIntegration,
-	//	m_bDrawIntegrationNodeNumbers,
-	//	m_bDrawIntegrationConnections,
-	//	m_bDrawIntegrationConnectionsCosts
-	//);
-
 	auto nodes = m_pGridGraph->GetAllNodes();
 
 	for (int i{}; i < ROWS; i++)
@@ -74,6 +69,7 @@ void FlowField::Render(float deltaTime) const
 			Vector2 position{ j * m_SizeCell + (m_SizeCell / 2.f), i * m_SizeCell + (m_SizeCell / 2.f) };
 			auto node = m_pGridGraph->GetNodeAtWorldPos(position);
 
+			DEBUGRENDERER2D->DrawPoint(position, 2.f, { 1, 0, 0 }, 0);
 			DEBUGRENDERER2D->DrawDirection(position, node->GetDirection(), 3.f, { 0, 1, 0 });
 		}
 	}
@@ -85,6 +81,13 @@ void FlowField::MakeGridGraph()
 	m_pIntegrationField = new GridGraph<IntegrationFieldNode, GraphConnection>(COLUMNS, ROWS, m_SizeCell, false, true, 1.f, 1.5f);
 
 	m_GoalNodeIdx = (COLUMNS * ROWS) - 1;
+	//m_GoalNodeIdx = 45;
+}
+
+void FlowField::CalculateFlowField()
+{
+	CalculateIntegrationField();
+	CalculateVectors();
 }
 
 void FlowField::CreateCostField()
@@ -119,7 +122,6 @@ void FlowField::CalculateIntegrationField()
 	{
 		int currentIdx = openList.front();
 		IntegrationFieldNode* currentNode = m_pIntegrationField->GetNode(currentIdx);
-		//FlowFieldNode* currentFlowNode = m_pGridGraph->GetNode(currentIdx);
 		openList.pop_front();
 
 		auto neighbours = m_pGridGraph->GetConnections(currentIdx);
@@ -130,11 +132,14 @@ void FlowField::CalculateIntegrationField()
 			FlowFieldNode* neighbourFlowNode = m_pGridGraph->GetNode(neighbour->GetTo());
 			IntegrationFieldNode* neighbourNode = m_pIntegrationField->GetNode(neighbour->GetTo());
 			
-			int endNodeCost{currentNode->GetIntegratinCost() + neighbourFlowNode->GetCost()};
+			int endNodeCost{currentNode->GetIntegrationCost() + neighbourFlowNode->GetCost()};
 
-			if (endNodeCost < neighbourNode->GetIntegratinCost())
+			if (endNodeCost > neighbourFlowNode->GetCost())
+				endNodeCost -= 1;
+
+			if (endNodeCost < neighbourNode->GetIntegrationCost())
 			{
-				if (std::find(openList.begin(), openList.end(), neighbourNode->GetIndex()) != openList.end())
+				if (std::find(openList.begin(), openList.end(), neighbourNode->GetIndex()) == openList.end())
 				{
 					openList.push_back(neighbourNode->GetIndex());
 				}
@@ -147,7 +152,34 @@ void FlowField::CalculateIntegrationField()
 
 void FlowField::CalculateVectors()
 {
+	auto nodes = m_pGridGraph->GetAllNodes();
 
+	for (const auto& node : nodes)
+	{
+		int idx = node->GetIndex();
+		auto neighbours = m_pIntegrationField->GetConnections(idx);
+
+		int lowestCostNeighbourIdx{};
+		int lowestCost{ INT_MAX };
+		for (const auto& neighbour : neighbours)
+		{
+			auto neighbourNode = m_pIntegrationField->GetNode(neighbour->GetTo());
+			if (neighbourNode->GetIntegrationCost() < lowestCost)
+			{
+				lowestCost = neighbourNode->GetIntegrationCost();
+				lowestCostNeighbourIdx = neighbourNode->GetIndex();
+			}
+		}
+
+		auto target = m_pGridGraph->GetNode(lowestCostNeighbourIdx);
+		Vector2 nodePosition{ m_pGridGraph->GetNodePos(node) };
+		Vector2 neighbourPosition{ m_pGridGraph->GetNodePos(target) };
+		
+		Vector2 direction = neighbourPosition - nodePosition;
+		direction = direction.GetNormalized();
+
+		node->SetDirection(direction);
+	}
 }
 
 void FlowField::ResetField()

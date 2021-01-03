@@ -65,6 +65,7 @@ private:
 
 	//Functions
 	void MakeGridGraph();
+	void CalculateFlowField();
 	void CreateCostField();
 	void CalculateIntegrationField();
 	void CalculateVectors();
