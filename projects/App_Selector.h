@@ -1,4 +1,5 @@
 #pragma once
 //Register the app in main.cpp
-#define Sandbox
+//#define Sandbox
+#define FlowFieldApp
 

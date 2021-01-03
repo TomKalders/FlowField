@@ -20,7 +20,6 @@
     <ClCompile Include="framework\EliteMath\EMatrix2x3.cpp" />
     <ClCompile Include="framework\EliteAI\EliteGraphs\EGraphConnectionTypes.cpp" />
     <ClCompile Include="framework\EliteAI\EliteGraphs\EGraphNodeTypes.cpp" />
-    <ClCompile Include="projects\App_PathfindingAStar\App_PathfindingAStar.cpp" />
     <ClCompile Include="framework\EliteAI\EliteGraphs\EliteGraphUtilities\EGraphEditor.cpp" />
     <ClCompile Include="framework\EliteAI\EliteGraphs\EliteGraphUtilities\EGraphRenderer.cpp" />
     <ClCompile Include="framework\EliteAI\EliteGraphs\ENavGraph.cpp" />
@@ -29,6 +28,7 @@
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteBehaviorTree\EBehaviorTree.cpp" />
     <ClCompile Include="framework\EliteAI\EliteGraphs\EInfluenceMap.cpp" />
     <ClCompile Include="framework\EliteMath\FMatrix.cpp" />
+    <ClCompile Include="projects\App_FlowField\FlowField.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="projects\App_Selector.h" />
@@ -86,7 +86,6 @@
     <ClInclude Include="framework\EliteAI\EliteGraphs\EGraphNodeTypes.h" />
     <ClInclude Include="framework\EliteAI\EliteGraphs\EIGraph.h" />
     <ClInclude Include="framework\EliteAI\EliteGraphs\EliteGraphAlgorithms\EEularianPath.h" />
-    <ClInclude Include="projects\App_PathfindingAStar\App_PathfindingAStar.h" />
     <ClInclude Include="framework\EliteAI\EliteGraphs\EGridGraph.h" />
     <ClInclude Include="framework\EliteAI\EliteGraphs\EliteGraphUtilities\EGraphEditor.h" />
     <ClInclude Include="framework\EliteAI\EliteGraphs\EliteGraphUtilities\EGraphRenderer.h" />
@@ -104,6 +103,7 @@
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteBehaviorTree\EBehaviorTree.h" />
     <ClInclude Include="framework\EliteAI\EliteGraphs\EInfluenceMap.h" />
     <ClInclude Include="framework\EliteMath\FMatrix.h" />
+    <ClInclude Include="projects\App_FlowField\FlowField.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />

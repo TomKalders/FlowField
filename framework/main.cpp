@@ -12,6 +12,10 @@
 #ifdef Sandbox
 	#include "projects/App_Sandbox/App_Sandbox.h"
 #endif
+#ifdef FlowFieldApp
+	#include "projects/App_FlowField/FlowField.h"
+#endif // FlowField
+
 
 //Hotfix for genetic algorithms project
 bool gRequestShutdown = false;
@@ -67,6 +71,10 @@ int main(int argc, char* argv[])
 #ifdef Sandbox
 		myApp = new App_Sandbox();
 #endif
+#ifdef FlowFieldApp
+		myApp = new FlowField();
+#endif // FlowField
+
 
 
 

@@ -1,5 +1,10 @@
-#ifndef ASTAR_APPLICATION_H
-#define ASTAR_APPLICATION_H
+//#pragma once
+//class  
+//{
+//};
+
+#ifndef FLOWFIELD_APPLICATION_H
+#define FLOWFIELD_APPLICATION_H
 //-----------------------------------------------------------------
 // Includes & Forward Declarations
 //-----------------------------------------------------------------
@@ -12,12 +17,12 @@
 //-----------------------------------------------------------------
 // Application
 //-----------------------------------------------------------------
-class App_PathfindingAStar final : public IApp
+class FlowField final : public IApp
 {
 public:
 	//Constructor & Destructor
-	App_PathfindingAStar() = default;
-	virtual ~App_PathfindingAStar();
+	FlowField() = default;
+	virtual ~FlowField();
 
 	//App Functions
 	void Start() override;
@@ -31,17 +36,12 @@ private:
 	Elite::Vector2 m_TargetPosition = Elite::ZeroVector2;
 
 	//Grid datamembers
-	static const int COLUMNS = 20;
+	static const int COLUMNS = 10;
 	static const int ROWS = 10;
 	unsigned int m_SizeCell = 15;
-	Elite::GridGraph<Elite::GridTerrainNode, Elite::GraphConnection>* m_pGridGraph;
+	Elite::GridGraph<Elite::FlowFieldNode, Elite::GraphConnection>* m_pGridGraph;
+	Elite::GridGraph<Elite::IntegrationFieldNode, Elite::GraphConnection>* m_pIntegrationField;
 
-
-	//Pathfinding datamembers
-	int startPathIdx = invalid_node_index;
-	int endPathIdx = invalid_node_index;
-	std::vector<Elite::GridTerrainNode*> m_vPath;
-	bool m_UpdatePath = true;
 
 	//Editor and Visualisation
 	Elite::EGraphEditor m_GraphEditor{};
@@ -56,12 +56,20 @@ private:
 	int m_SelectedHeuristic = 4;
 	Elite::Heuristic m_pHeuristicFunction = Elite::HeuristicFunctions::Chebyshev;
 
+	bool m_bDrawIntegration = false;
+	bool m_bDrawIntegrationNodeNumbers = false;
+	bool m_bDrawIntegrationConnections = false;
+	bool m_bDrawIntegrationConnectionsCosts = false;
+
 	//Functions
 	void MakeGridGraph();
+	void CreateCostField();
+	void CalculateIntegrationField();
+	void ResetField();
 	void UpdateImGui();
 
 	//C++ make the class non-copyable
-	App_PathfindingAStar(const App_PathfindingAStar&) = delete;
-	App_PathfindingAStar& operator=(const App_PathfindingAStar&) = delete;
+	FlowField(const FlowField&) = delete;
+	FlowField& operator=(const FlowField&) = delete;
 };
 #endif

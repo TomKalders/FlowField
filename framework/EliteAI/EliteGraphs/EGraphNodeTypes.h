@@ -93,4 +93,37 @@ namespace Elite
 	private:
 		float m_Influence;
 	};
+
+
+
+	// Custom Nodes
+	class FlowFieldNode final : public GridTerrainNode
+	{
+	public:
+		FlowFieldNode(int index)
+			: GridTerrainNode(index) {};
+		
+		Vector2 GetDirection() const { return m_Direction; }
+		int GetCost() const { return m_Cost; }
+		void SetDirection(const Vector2& direction) { m_Direction = direction; }
+		void SetCost(int cost) { m_Cost = cost; }
+
+	private:
+		Vector2 m_Direction = {1, 0};
+		int m_Cost = {1};
+
+	};
+
+	class IntegrationFieldNode final : public GraphNode
+	{
+	public:
+		IntegrationFieldNode(int index)
+			: GraphNode(index) {}
+	
+		int GetIntegratinCost() const { return m_IntegrationCost; }
+		void SetIntegrationCost(int integrationCost) { m_IntegrationCost = integrationCost; }
+
+	private:
+		int m_IntegrationCost{ 65535 };
+	};
 }
