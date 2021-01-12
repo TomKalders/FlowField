@@ -13,7 +13,8 @@
 #include "framework\EliteAI\EliteGraphs\EliteGraphUtilities\EGraphEditor.h"
 #include "framework\EliteAI\EliteGraphs\EliteGraphUtilities\EGraphRenderer.h"
 
-
+#include "projects/Shared/BaseAgent.h"
+#include "projects/Shared/NavigationColliderElement.h"
 //-----------------------------------------------------------------
 // Application
 //-----------------------------------------------------------------
@@ -61,8 +62,13 @@ private:
 	bool m_DrawIntegrationCosts = false;
 	bool m_DrawCosts = false;
 	bool m_DrawVectors = true;
+	bool m_DrawGoal = true;
+
+	float m_AgentSpeed = 10.f;
 
 	const int m_NonTraversable = 100000;
+	std::vector<BaseAgent*> m_Agents;
+	std::vector<NavigationColliderElement*> m_Walls;
 
 	//Functions
 	void MakeGridGraph();
@@ -72,23 +78,16 @@ private:
 	void Dijkstra();
 	void BFS();
 
+	void CreateAgents(int nrOfAgents);
+	void CreateBoundaries();
+
 	void MakeNotTraversable(int nodeIdx);
+	Vector2 GetNodePosition(int nodeIdx) const;
+	Vector2 GetNodePosition(FlowFieldNode* node) const;
 
 	void CalculateVectors();
 	void ResetField();
 	void UpdateImGui();
-
-	const std::vector<Elite::Vector2> m_Directions{
-		Elite::Vector2{-1,  1},
-		Elite::Vector2{ 0,  1},
-		Elite::Vector2{ 1,  1},
-		Elite::Vector2{ 1,  0},
-		Elite::Vector2{ 1, -1},
-		Elite::Vector2{ 0, -1},
-		Elite::Vector2{-1, -1},
-		Elite::Vector2{-1,  0},
-		Elite::Vector2{ 0,  0}
-	};
 
 	//C++ make the class non-copyable
 	FlowField(const FlowField&) = delete;

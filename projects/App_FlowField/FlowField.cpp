@@ -15,6 +15,18 @@ FlowField::~FlowField()
 {
 	SAFE_DELETE(m_pGridGraph);
 	SAFE_DELETE(m_pIntegrationField);
+
+	for (BaseAgent* agent : m_Agents)
+	{
+		delete agent;
+		agent = nullptr;
+	}
+
+	for (NavigationColliderElement* wall : m_Walls)
+	{
+		delete wall;
+		wall = nullptr;
+	}
 }
 
 //Functions
@@ -28,6 +40,9 @@ void FlowField::Start()
 	MakeGridGraph();
 	//CreateCostField();
 	CalculateFlowField();
+
+	CreateBoundaries();
+	CreateAgents(20.f);
 }
 
 void FlowField::Update(float deltaTime)
@@ -66,11 +81,57 @@ void FlowField::Update(float deltaTime)
 
 		if (clickedNode)
 		{
-			//m_pGridGraph->RemoveConnectionsToAdjacentNodes(clickedNode->GetIndex());
-			//m_pIntegrationField->RemoveConnectionsToAdjacentNodes(clickedNode->GetIndex());
-			//m_pGridGraph->RemoveNode(clickedNode->GetIndex());
 			MakeNotTraversable(clickedNode->GetIndex());
 			CalculateFlowField();
+		}
+	}
+
+	for (BaseAgent* agent : m_Agents)
+	{
+		auto agentNode = m_pGridGraph->GetNodeAtWorldPos(agent->GetPosition());
+		Vector2 velocity{};
+
+		if (agentNode)
+		{
+			velocity = agentNode->GetDirection() * m_AgentSpeed;
+
+			if (velocity == ZeroVector2)
+			{
+				velocity = agent->GetLinearVelocity();
+			}
+
+
+			if (agentNode->GetCost() >= m_NonTraversable)
+			{
+				Vector2 NodePosition{ m_pGridGraph->GetNodePos(agentNode) * float(m_SizeCell) };
+				NodePosition.x += float(m_SizeCell) / 2.f;
+				NodePosition.y += float(m_SizeCell) / 2.f;
+
+				velocity = agent->GetPosition() - NodePosition;
+				velocity = velocity.GetNormalized();
+				velocity *= m_AgentSpeed;
+			}
+
+			//agent->SetLinearVelocity(velocity);
+			float angle = Elite::GetOrientationFromVelocity(velocity);
+			agent->SetRotation(angle - (float(M_PI) / 2.f));
+			agent->SetLinearVelocity(Elite::Lerp(agent->GetLinearVelocity(), velocity, 0.5f));
+			agent->Update(deltaTime);
+
+			if (agentNode->GetIndex() == m_GoalNodeIdx)
+			{
+				int randomNr = rand() % (COLUMNS * ROWS);
+
+				auto randomNode = m_pGridGraph->GetNode(randomNr);
+				while (randomNode->GetCost() >= m_NonTraversable)
+				{
+					randomNr = rand() % (COLUMNS * ROWS);
+					randomNode = m_pGridGraph->GetNode(randomNr);
+				}
+
+				m_GoalNodeIdx = randomNr;
+				CalculateFlowField();
+			}
 		}
 	}
 
@@ -89,6 +150,14 @@ void FlowField::Render(float deltaTime) const
 		m_bDrawConnections,
 		m_bDrawConnectionsCosts
 	);
+
+
+
+	if (m_DrawGoal)
+	{
+		Vector2 nodePos = GetNodePosition(m_GoalNodeIdx);
+		DEBUGRENDERER2D->DrawCircle(nodePos, 4.f, { 1, 0, 1 }, 0.f);
+	}
 
 
 
@@ -115,6 +184,7 @@ void FlowField::Render(float deltaTime) const
 				DEBUGRENDERER2D->DrawPoint(position, 2.f, { 1, 0, 0 }, 0);
 				DEBUGRENDERER2D->DrawDirection(position, node->GetDirection(), 3.f, { 0, 1, 0 });
 			}
+
 		}
 	}
 }
@@ -243,6 +313,40 @@ void FlowField::BFS()
 	}
 }
 
+void FlowField::CreateAgents(int nrOfAgents)
+{
+	for (int i{}; i < nrOfAgents - 1; i++)
+	{
+		BaseAgent* pAgent = new BaseAgent();
+		pAgent->SetPosition({ 0.5f, 0.5f });
+		m_Agents.push_back(pAgent);
+	}
+
+	BaseAgent* offsetAgent{ new BaseAgent() };
+	offsetAgent->SetPosition({ 0.6f, 0.6f });
+	m_Agents.push_back(offsetAgent);
+
+}
+
+void FlowField::CreateBoundaries()
+{
+	float gridWidth{ COLUMNS * float(m_SizeCell) };
+	float gridHeight{ ROWS * float(m_SizeCell) };
+	float wallSize{float(m_SizeCell)};
+
+	Vector2 wallPos{ gridWidth / 2.f, -0.5f * wallSize };
+	m_Walls.push_back(new NavigationColliderElement(wallPos, gridWidth, wallSize));
+
+	wallPos.y = gridHeight + (0.5f * wallSize);
+	m_Walls.push_back(new NavigationColliderElement(wallPos, gridWidth, wallSize));
+
+	wallPos = Vector2{ -0.5f * wallSize, gridHeight / 2.f };
+	m_Walls.push_back(new NavigationColliderElement(wallPos, wallSize, gridHeight));
+
+	wallPos.x = gridWidth + (0.5f * wallSize);
+	m_Walls.push_back(new NavigationColliderElement(wallPos, wallSize, gridHeight));
+}
+
 void FlowField::MakeNotTraversable(int nodeIdx)
 {
 	auto node = m_pGridGraph->GetNode(nodeIdx);
@@ -250,7 +354,25 @@ void FlowField::MakeNotTraversable(int nodeIdx)
 	if (node)
 	{
 		node->SetCost(m_NonTraversable);
+		Vector2 nodePos = GetNodePosition(node);
+		m_Walls.push_back(new NavigationColliderElement(nodePos, float(m_SizeCell), float(m_SizeCell)));
 	}
+}
+
+Vector2 FlowField::GetNodePosition(int nodeIdx) const
+{
+	auto node = m_pGridGraph->GetNode(nodeIdx);
+
+	return GetNodePosition(node);
+}
+
+Vector2 FlowField::GetNodePosition(FlowFieldNode* node) const
+{
+	Vector2 nodePos = m_pGridGraph->GetNodePos(node) * float(m_SizeCell);
+	nodePos.x += float(m_SizeCell) / 2.f;
+	nodePos.y += float(m_SizeCell) / 2.f;
+
+	return nodePos;
 }
 
 void FlowField::CalculateVectors()
@@ -352,6 +474,7 @@ void FlowField::UpdateImGui()
 		ImGui::Checkbox("Draw Integrationfield", &m_DrawIntegrationCosts);
 		ImGui::Checkbox("Draw Costs", &m_DrawCosts);
 		ImGui::Checkbox("Draw Vectors", &m_DrawVectors);
+		ImGui::Checkbox("Draw Goal", &m_DrawGoal);
 
 		if (ImGui::Combo("", &m_SelectedHeuristic, "Manhattan\0Euclidean\0SqrtEuclidean\0Octile\0Chebyshev", 4))
 		{
