@@ -58,16 +58,22 @@ private:
 	int m_SelectedHeuristic = 4;
 	Elite::Heuristic m_pHeuristicFunction = Elite::HeuristicFunctions::Chebyshev;
 
-	bool m_bDrawIntegration = false;
-	bool m_bDrawIntegrationNodeNumbers = false;
-	bool m_bDrawIntegrationConnections = false;
-	bool m_bDrawIntegrationConnectionsCosts = false;
+	bool m_DrawIntegrationCosts = false;
+	bool m_DrawCosts = false;
+	bool m_DrawVectors = true;
+
+	const int m_NonTraversable = 100000;
 
 	//Functions
 	void MakeGridGraph();
 	void CalculateFlowField();
 	void CreateCostField();
 	void CalculateIntegrationField();
+	void Dijkstra();
+	void BFS();
+
+	void MakeNotTraversable(int nodeIdx);
+
 	void CalculateVectors();
 	void ResetField();
 	void UpdateImGui();
