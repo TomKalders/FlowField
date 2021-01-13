@@ -31,19 +31,15 @@ The steps the algorithm takes are:
   * Create a closed and open list.
   * Add the goal node to the open list.
   * Loop over the openlist while it's not empty.
-  
      * Get the **current node** out of the openlist.
      * Loop over the neighbours of the current node.
-     
         * Check if the neighbour node's cost is not higher or equal to impassable terrain (100000).
             * Check if the neighbour node is not in the closed list.
                 * Calculate the intigration cost (current node's integration cost + cost of the connection + neighbour's cost field cost)
-                    * If the neighbour's integration cost > calculated intigration cost
+                     * If the neighbour's integration cost > calculated intigration cost
                         * Set the neighbour's intigration cost to the calculated intigration cost
-                    
-                    * Check if the neighbour node is not in the openlist
-                       * Add the neighbour node to the openlist
-     
+                     * Check if the neighbour node is not in the openlist
+                        * Add the neighbour node to the openlist
      * Add the currentnode to the closed list.
                         
                         
