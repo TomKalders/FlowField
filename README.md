@@ -45,6 +45,7 @@ The steps the algorithm takes are:
                      * Check if the neighbour node is not in the openlist
                         * Add the neighbour node to the openlist
      * Add the currentnode to the closed list.
+
 ![Intigration Field](/Images/IntegrationField.jpg)
 
 ### Flow/Vector field
@@ -68,4 +69,5 @@ The flowfield will automatically update when placing a new wall or goal node.
 
 I also added checkboxes using IMGUI to show the flow/vector field, the cost field and the integration field.
 
-
+### Result
+![Result](/Images/Result.gif)
