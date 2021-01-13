@@ -13,7 +13,7 @@ This optimizes performance for path finding with a large group of agents.
 ## Implementation
 Most of the code resides in the FlowField.h & FlowField.cpp files.
 
-I first started by creating a new node types for the provided graphs (in EGraphNodeType.h).
+I first started by creating new node types for the provided graphs (in EGraphNodeType.h).
   * FlowfieldNode: This holds the cost and direction.
   * IntegrationfieldNode: This holds the integration cost.
 
