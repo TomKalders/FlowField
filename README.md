@@ -11,7 +11,9 @@ from which the agents can read a direction from to know what way to go.
 This optimizes performance for path finding with a large group of agents.
 
 ## Implementation
-I first started by creating a new node types for the provided graphs.
+Most of the code resides in the FlowField.h & FlowField.cpp files.
+
+I first started by creating a new node types for the provided graphs (in EGraphNodeType.h).
   * FlowfieldNode: This holds the cost and direction.
   * IntegrationfieldNode: This holds the integration cost.
 
@@ -28,6 +30,7 @@ In this implementation I used a Breadth First Search (BFS) algorithm.
 Before we start the algorithm we first need a **Goal Node**. When we have a goal node we can start the BFS.
 
 The steps the algorithm takes are:
+  * Reset the integration cost of all the nodes to a very high number
   * Create a closed and open list.
   * Add the goal node to the open list.
   * Loop over the openlist while it's not empty.
@@ -41,6 +44,16 @@ The steps the algorithm takes are:
                      * Check if the neighbour node is not in the openlist
                         * Add the neighbour node to the openlist
      * Add the currentnode to the closed list.
-                        
-                        
-                        
+
+### Flow/Vector field
+Once the Algorithm is done we can start to create the vector field, which is basically the resulting flow field
+
+For each current node we check all it's neighbours and check which of them has the lowest integration cost.
+we then set the direction of the current node to be a vector from the current node's center to the center of the lowest cost neighbour and normalize it.
+
+now the flowfield is calculated.
+
+### Agents
+With the flowfield calculated I now update the agents. I check in what node they currently are in and give them the linear velocity of the direction of that node.
+I multiply that direciton with a set speed.
+
