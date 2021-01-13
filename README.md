@@ -23,6 +23,7 @@ I made 2 graphs: the flow field (with cost field) and the integration field.
 The first thing to create is the cost field. The lower the cost of a node, the easier the terrain is to traverse.
 You can set the cost of a node to be very high to act as impassable terrain. I used a value of 100000 as the cost of impassable terrain.
 In this implementation I only have a cost of 0 (easy terrain) or a cost of 100000 (impassable terrain).
+![Cost Field](/Images/CostField.jpg)
 
 ### Integration field
 The integration field is where most of the work happens. It is calculated using a pathfinding algorithm.
@@ -55,5 +56,14 @@ now the flowfield is calculated.
 
 ### Agents
 With the flowfield calculated I now update the agents. I check in what node they currently are in and give them the linear velocity of the direction of that node.
-I multiply that direciton with a set speed.
+I multiply that direction with a set speed.
+
+### Extra's
+The goal node in this implementation is from the start set to the top left node. 
+When they reach the goal node another node without a wall is randomly selected as the next goal node.
+You can also set a goal node by left clicking on a node. you can place walls by middle mouse clicking on a node. 
+The flowfield will automatically update when placing a new wall or goal node.
+
+I also added checkboxes using IMGUI to show the flow/vector field, the cost field and the integration field.
+
 
