@@ -42,7 +42,7 @@ void FlowField::Start()
 	CalculateFlowField();
 
 	CreateBoundaries();
-	CreateAgents(20.f);
+	//CreateAgents(20.f);
 }
 
 void FlowField::Update(float deltaTime)
