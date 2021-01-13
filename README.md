@@ -1,7 +1,7 @@
 # Flow Field Implementation
 
 ## Framework
-The framework used in this project us a school provided c++ framework (Elite Framework).
+The framework used in this project is a school provided c++ framework (Elite Framework).
 It contains math and SDL libraries. They also provided basic agents, graphs and navigation colliders.
 
 ## Purpose
